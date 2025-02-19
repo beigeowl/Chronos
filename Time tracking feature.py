@@ -34,35 +34,29 @@ def track_screen_time():
     usage_data = {}
     last_app = None
     last_time = time.time()
+    
+    
+    while True:
+        # Get the currently active app and window title
+        current_app, window_title = get_active_window_name()
 
-    try:
-        print("Tracking screen time... Press Ctrl+C to stop.")
-        while True:
-            # Get the currently active app and window title
-            current_app, window_title = get_active_window_name()
+        if current_app:
+            current_time = time.time()
 
-            if current_app:
-                current_time = time.time()
+            # If the app changes, calculate time spent on the last app
+            if last_app and current_app != last_app:
+                time_spent = current_time - last_time
+                usage_data[last_app] = usage_data.get(last_app, 0) + time_spent
+                last_time = current_time
 
-                # If the app changes, calculate time spent on the last app
-                if last_app and current_app != last_app:
-                    time_spent = current_time - last_time
-                    usage_data[last_app] = usage_data.get(last_app, 0) + time_spent
-                    last_time = current_time
+            last_app = current_app
 
-                last_app = current_app
-
-            # Print usage summary every 10 seconds
-            if int(current_time) % 10 == 0:
-                print("\nScreen Time Summary:")
-                for app, seconds in usage_data.items():
-                    print(f"{app}: {seconds // 60:.0f} min {seconds % 60:.0f} sec") #Shows app .exe name, change in the future for user functionality
-                time.sleep(1)  # Avoid duplicate prints within the same second
-    except KeyboardInterrupt:
-        print("\nStopped tracking.")
-        print("\nFinal Screen Time Summary:")
-        for app, seconds in usage_data.items():
-            print(f"{app}: {seconds // 60:.0f} min {seconds % 60:.0f} sec")
-
+        # Print usage summary every 10 seconds
+        if int(current_time) % 10 == 0:
+            print("\nScreen Time Summary:")
+            for app, seconds in usage_data.items():
+                print(f"{app}: {seconds // 60:.0f} min {seconds % 60:.0f} sec")
+            time.sleep(1)  # Avoid duplicate prints within the same second}
+    
 if __name__ == "__main__":
     track_screen_time()
