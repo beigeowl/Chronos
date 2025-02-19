@@ -30,6 +30,10 @@ def get_active_window_name():
 def track_screen_time():
     """
     Tracks screen time for each app and prints the usage summary.
+    args: none
+    returns:
+        app (string): name of a tracked app
+        seconds (int): number of seconds an app has been open for
     """
     usage_data = {}
     last_app = None
@@ -56,6 +60,7 @@ def track_screen_time():
             print("\nScreen Time Summary:")
             for app, seconds in usage_data.items():
                 print(f"{app}: {seconds // 60:.0f} min {seconds % 60:.0f} sec")
+                return app, seconds
             time.sleep(1)  # Avoid duplicate prints within the same second}
     
 if __name__ == "__main__":
