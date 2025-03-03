@@ -10,6 +10,8 @@ import time
 import psutil
 import win32gui
 import win32process
+import json
+
 
 def get_active_window_name():
     """
@@ -17,6 +19,7 @@ def get_active_window_name():
     args: none
     returns: none
     """
+    time.sleep(1)
     try:
         hwnd = win32gui.GetForegroundWindow()  # Get the handle of the active window
         _, pid = win32process.GetWindowThreadProcessId(hwnd)  # Get the process ID
@@ -43,12 +46,12 @@ def track_screen_time():
         while True:
             # Get the currently active app and window title
             current_app, window_title = get_active_window_name()
-
+            
+            #print(current_app)
             if current_app:
                 current_time = time.time()
 
-                # If the app changes, calculate time spent on the last app
-                if last_app and current_app != last_app:
+                if int(current_time) % 10 == 0:
                     time_spent = current_time - last_time
                     usage_data[last_app] = usage_data.get(last_app, 0) + time_spent
                     last_time = current_time
@@ -61,6 +64,9 @@ def track_screen_time():
                 for app, seconds in usage_data.items():
                     print(f"{app}: {seconds // 60:.0f} min {seconds % 60:.0f} sec")
                     #return app, seconds
+
+                with open('times.json', 'w') as fp:
+                    json.dump(usage_data, fp)
                 time.sleep(1)  # Avoid duplicate prints within the same second}
     
     except KeyboardInterrupt:
@@ -69,5 +75,8 @@ def track_screen_time():
         for app, seconds in usage_data.items():
             print(f"{app}: {seconds // 60:.0f} min {seconds % 60:.0f} sec")
             #return app, seconds
+
+        print(usage_data.items())
+
 if __name__ == "__main__":
     track_screen_time()
