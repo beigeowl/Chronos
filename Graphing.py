@@ -1,12 +1,20 @@
+import json
+import threading
+import tkinter as tk
+from tkinter import ttk
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+
+with open("times.json", "r") as t:
+    data = json.load(t)
 class ScreenTimeTracker:
     def __init__(self, root):
         self.root = root
         self.root.title("Screen Time Tracker")
-        self.usage_data = {}
-        self.last_app = None
-        self.last_time = time.time()
+        self.usage_data = data
         
-        self.figure, self.ax = plt.subplots(figsize=(6, 4))
+        
+        self.figure, self.ax = plt.subplots(figsize=(8, 6))
         self.canvas = FigureCanvasTkAgg(self.figure, master=root)
         self.canvas.get_tk_widget().pack()
         
@@ -14,32 +22,6 @@ class ScreenTimeTracker:
         self.label.pack()
         
         self.start_tracking()
-    
-    def get_active_window_name(self):
-        try:
-            hwnd = win32gui.GetForegroundWindow()
-            _, pid = win32process.GetWindowThreadProcessId(hwnd)
-            process = psutil.Process(pid)
-            app_name = process.name()
-            return app_name
-        except Exception:
-            return None
-    
-    def track_screen_time(self):
-        while True:
-            current_app = self.get_active_window_name()
-            current_time = time.time()
-
-            if current_app:
-                if self.last_app and current_app != self.last_app:
-                    time_spent = current_time - self.last_time
-                    self.usage_data[self.last_app] = self.usage_data.get(self.last_app, 0) + time_spent
-                    self.last_time = current_time
-                    self.update_graph()
-
-                self.last_app = current_app
-            
-            time.sleep(1)
     
     def update_graph(self):
         self.ax.clear()
@@ -55,3 +37,9 @@ class ScreenTimeTracker:
     def start_tracking(self):
         tracking_thread = threading.Thread(target=self.track_screen_time, daemon=True)
         tracking_thread.start()
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = ScreenTimeTracker(root)
+    root.mainloop()
+
