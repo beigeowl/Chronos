@@ -47,11 +47,10 @@ def track_screen_time():
             # Get the currently active app and window title
             current_app, window_title = get_active_window_name()
             
-            #print(current_app)
             if current_app:
                 current_time = time.time()
 
-                if int(current_time) % 10 == 0:
+                if int(current_time) % 2 == 0:
                     time_spent = current_time - last_time
                     usage_data[last_app] = usage_data.get(last_app, 0) + time_spent
                     last_time = current_time
@@ -59,14 +58,14 @@ def track_screen_time():
                 last_app = current_app
 
             # Print usage summary every 10 seconds
-            if int(current_time) % 10 == 0:
+            if int(current_time) % 2 == 0:
                 print("\nScreen Time Summary:")
                 for app, seconds in usage_data.items():
                     print(f"{app}: {seconds // 60:.0f} min {seconds % 60:.0f} sec")
-                    #return app, seconds
 
                 with open('times.json', 'w') as fp:
                     json.dump(usage_data, fp)
+                    fp.flush()
                 time.sleep(1)  # Avoid duplicate prints within the same second}
     
     except KeyboardInterrupt:
@@ -74,9 +73,5 @@ def track_screen_time():
         print("Final Screen Time Summary: ")
         for app, seconds in usage_data.items():
             print(f"{app}: {seconds // 60:.0f} min {seconds % 60:.0f} sec")
-            #return app, seconds
 
-        print(usage_data.items())
-
-if __name__ == "__main__":
-    track_screen_time()
+track_screen_time()
