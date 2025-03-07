@@ -60,3 +60,18 @@ class Menu(ttk.Frame):
         self.menulabel.grid(column = 0, row = 1)
         self.entry.grid(column =  1, row = 0)
 createApp()
+
+
+"""
+with open("times.json", "r") as t:
+    times = json.load(t)
+
+daily = {key: val for key, val in sorted(times.items(), key = lambda ele: ele[1], reverse = True)}
+# from https://www.geeksforgeeks.org/python-sort-a-dictionary/ 
+
+for key, value in daily.items():
+
+T = Text(root, height = , width = , font =, yscrollcommand = True)
+
+T.insert()
+"""
