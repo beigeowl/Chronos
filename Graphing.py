@@ -1,16 +1,12 @@
-import json
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import functools
-#import numpy as np
 import threading
-#import TimeTracker
 import time
 import psutil
 import win32gui
 import win32process
-
-
+import win32api
 
 def get_active_window_name():
     """
@@ -22,10 +18,18 @@ def get_active_window_name():
     try:
         hwnd = win32gui.GetForegroundWindow()  # Get the handle of the active window
         _, pid = win32process.GetWindowThreadProcessId(hwnd)  # Get the process ID
-        process = psutil.Process(pid)  # Get the process object
-        app_name = process.name()  # Get the process name
-        window_title = win32gui.GetWindowText(hwnd)  # Get the window title
-        return app_name, window_title
+        # Get the process executable path using psutil
+        process = psutil.Process(pid)
+        exe_path = process.exe()
+        
+        # Get file info
+        language, codepage = win32api.GetFileVersionInfo(exe_path, '\\VarFileInfo\\Translation')[0]
+        string_file_info = f'\\StringFileInfo\\{language:04x}{codepage:04x}\\FileDescription'
+        
+        # Get the description
+        description = win32api.GetFileVersionInfo(exe_path, string_file_info)
+        
+        return description
     except Exception:
         return None, None  # Return None if there's an issue
 
@@ -46,13 +50,13 @@ def track_screen_time():
     try:
         while True:
             # Get the currently active app and window title
-            current_app, window_title = get_active_window_name()
+            current_app = get_active_window_name()
             
             if current_app:
                 current_time = time.time()
 
                 if int(current_time) % 2 == 0:
-                    time_spent = current_time - last_time
+                    time_spent = round(current_time - last_time, 0)
                     usage_data[last_app] = usage_data.get(last_app, 0) + time_spent
                     last_time = current_time
 
@@ -64,9 +68,6 @@ def track_screen_time():
                 for app, seconds in usage_data.items():
                     print(f"{app}: {seconds // 60:.0f} min {seconds % 60:.0f} sec")
 
-                # with open('times.json', 'w') as fp:
-                #     json.dump(usage_data, fp)
-                #     fp.flush()
                 time.sleep(1)  # Avoid duplicate prints within the same second}
     
     except KeyboardInterrupt:
@@ -75,18 +76,9 @@ def track_screen_time():
         for app, seconds in usage_data.items():
             print(f"{app}: {seconds // 60:.0f} min {seconds % 60:.0f} sec")
 
-
-
-
-
-
-
 fig, ax = plt.subplots()
 
 def plot(frame, ax, usage_data):
-    # with open('times.json', 'r') as times:
-    #     usage_data = json.load(times)
-
     x = usage_data.keys()
     y = usage_data.values()
 
@@ -102,5 +94,8 @@ def plot(frame, ax, usage_data):
 
 timeTrackingThread = threading.Thread(target=track_screen_time, daemon = True)
 timeTrackingThread.start()
+
+#print(usage_data)
+
 ani = animation.FuncAnimation(fig, functools.partial(plot, ax=ax, usage_data=usage_data))
 plt.show()
