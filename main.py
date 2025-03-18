@@ -19,7 +19,8 @@ class createApp(tk.Tk):
 
         #Main Setup
         self.title('Chronos')
-        self.geometry(f'{screen_width}x{screen_height}') #Fills the window
+        self.geometry(f'{screen_width}x{screen_height}') #Sets window starting size
+        self.state('zoomed') #Fills the window
         self.minsize(int(screen_width/2),int(screen_height/2)) #Ensures window does not shrink fruther than 50% size
 
         #widgets
@@ -39,13 +40,18 @@ class Menu(ttk.Frame):
         self.create_widget()
 
 
+    # def process_widget(self, event):
+    #     print('poop')
+
     def create_widget(self):
         
         
         #creates widgets
-        self.button1 = ttk.Button(self, text = 'show graph')
+        self.button1 = ttk.Button(self, text = 'show graph', command = self.start_timer)
         self.menulabel = tk.Label(self, text = "Name", bg = 'red')
-        self.entry = ttk.Entry(self)
+        
+        self.entry = ttk.Entry(self, textvariable = 'subname')
+        # self.entry.bind('<return>', self.process_widget)
 
 
         self.widget_placement() #calls placement
@@ -56,22 +62,19 @@ class Menu(ttk.Frame):
         self.columnconfigure((0,1),weight = 1)
 
         #place widgets
-        self.button1.grid(row = 0, column = 0)
-        self.menulabel.grid(column = 0, row = 1)
+        self.button1.grid(row = 0, column = 0, sticky = 'N')
+        self.menulabel.grid(column = 0, row = 1, columnspan = 2)
         self.entry.grid(column =  1, row = 0)
+
+    def start_timer(self):
+        print('success!')
+
+
+    # def stop_timer():
+
+    # def format_time():
+
+
+        
+
 createApp()
-
-
-"""
-with open("times.json", "r") as t:
-    times = json.load(t)
-
-daily = {key: val for key, val in sorted(times.items(), key = lambda ele: ele[1], reverse = True)}
-# from https://www.geeksforgeeks.org/python-sort-a-dictionary/ 
-
-for key, value in daily.items():
-
-T = Text(root, height = , width = , font =, yscrollcommand = True)
-
-T.insert()
-"""
