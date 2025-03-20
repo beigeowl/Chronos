@@ -1,6 +1,16 @@
 import tkinter as tk
 from tkinter import ttk #Themes
 from tkinter import messagebox #Pop up message windows
+import time
+import psutil
+import win32gui
+import win32process
+import threading
+import win32api
+
+
+
+
 
 class createApp(tk.Tk): 
      #creates an instance of the main window as a class, creates the main application window
@@ -30,6 +40,9 @@ class createApp(tk.Tk):
 
 class Menu(ttk.Frame):
     def __init__(self, parent): 
+
+        self.tracking = False
+
         #Parent used to pass the newfound widget/object through the master/App
         #Creates Frame (invisible box to hold widgets)
         super().__init__(parent)
@@ -47,7 +60,8 @@ class Menu(ttk.Frame):
         
         
         #creates widgets
-        self.button1 = ttk.Button(self, text = 'show graph', command = self.start_timer)
+        self.start_button = ttk.Button(self, text = 'start', command = self.start_timer)
+        self.stop_button = ttk.Button(self, text = 'stop', command = self.stop_timer)
         self.menulabel = tk.Label(self, text = "Name", bg = 'red')
         
         self.entry = ttk.Entry(self, textvariable = 'subname')
@@ -62,15 +76,97 @@ class Menu(ttk.Frame):
         self.columnconfigure((0,1),weight = 1)
 
         #place widgets
-        self.button1.grid(row = 0, column = 0, sticky = 'N')
+        self.start_button.grid(row = 0, column = 0, sticky = 'N')
+        self.stop_button.grid(row = 0, column = 0, sticky = 'S')
         self.menulabel.grid(column = 0, row = 1, columnspan = 2)
         self.entry.grid(column =  1, row = 0)
 
     def start_timer(self):
-        print('success!')
+        
+        if not self.tracking:
+            print('success!')
+            self.tracking = True
+            self.track_thread = threading.Thread(target=self.track_screen_time, daemon=True) #tracking screen time in the background
+            self.track_thread.start()
+        
+    def stop_timer(self):
+        print('stopped tracking')
+        self.tracking = False
 
+    def get_active_window_name(self):
+        """
+        Gets the name of the currently active window.
+        args: none
+        returns: none
+        """
+        time.sleep(1)
+        try:
+            hwnd = win32gui.GetForegroundWindow()  # Get the handle of the active window
+            _, pid = win32process.GetWindowThreadProcessId(hwnd)  # Get the process ID
+            # Get the process executable path using psutil
+            process = psutil.Process(pid)
+            exe_path = process.exe()
+            
+            # Get file info
+            language, codepage = win32api.GetFileVersionInfo(exe_path, '\\VarFileInfo\\Translation')[0]
+            string_file_info = f'\\StringFileInfo\\{language:04x}{codepage:04x}\\FileDescription'
+            
+            # Get the description
+            description = win32api.GetFileVersionInfo(exe_path, string_file_info)
+            
+            return description
+        except Exception:
+            return None, None  # Return None if there's an issue
 
-    # def stop_timer():
+    def track_screen_time(self):
+        """
+        Tracks screen time for each app and prints the usage summary.
+        args: none
+        returns:
+            app (string): name of a tracked app
+            seconds (int): number of seconds an app has been open for
+        """
+        global usage_data
+        usage_data = {}
+        
+        last_app = None
+        last_time = time.time()
+        
+        try:
+            while self.tracking:
+                # Get the currently active app and window title
+                current_app = self.get_active_window_name()
+                
+                if current_app:
+                    current_time = time.time()
+
+                    if int(current_time) % 2 == 0:
+                        time_spent = current_time - last_time
+                        usage_data[last_app] = usage_data.get(last_app, 0) + time_spent
+                        last_time = current_time
+
+                    last_app = current_app
+
+                # Print usage summary every 10 seconds
+                if int(current_time) % 2 == 0:
+                    print("\nScreen Time Summary:")
+                    for app, seconds in usage_data.items():
+                        print(f"{app}: {seconds // 60:.0f} min {seconds % 60:.0f} sec")
+
+                    # with open('times.json', 'w') as fp:
+                    #     json.dump(usage_data, fp)
+                    #     fp.flush()
+                    time.sleep(1)  # Avoid duplicate prints within the same second}
+        except Exception:
+            if self.tracking:
+                print("\nStopped Tracking")
+                print("Final Screen Time Summary: ")
+                for app, seconds in usage_data.items():
+                    print(f"{app}: {seconds // 60:.0f} min {seconds % 60:.0f} sec")
+
+    
+
+    
 
     # def format_time():
 
