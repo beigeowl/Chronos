@@ -22,26 +22,21 @@ class ScreenTimeApp:
         self.start_tracking()
         
     def create_widgets(self):
-        # Create a frame for the graph
         self.graph_frame = ttk.Frame(self.root)
         self.graph_frame.pack(fill=tk.BOTH, expand=True)
-        
-        # Create Matplotlib figure and axis
         self.fig, self.ax = plt.subplots()
         self.ax.set_title("Time per App")
         self.ax.set_xlabel("App")
         self.ax.set_ylabel("Seconds")
         
-        # Embed the Matplotlib figure in Tkinter
         self.canvas = FigureCanvasTkAgg(self.fig, master=self.graph_frame)
         self.canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
-        
-        # Start animation
+    
         self.ani = animation.FuncAnimation(self.fig, self.plot, interval=2000)
     
     def get_active_window_name(self):
         """
-        Gets the name of the currently active window.
+        
         """
         try:
             hwnd = win32gui.GetForegroundWindow()
@@ -56,6 +51,9 @@ class ScreenTimeApp:
             return None
     
     def track_screen_time(self):
+        """
+        
+        """
         last_app = None
         last_time = time.time()
         
