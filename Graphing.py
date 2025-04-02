@@ -7,12 +7,15 @@ import psutil
 import win32gui
 import win32process
 import win32api
+import json
+import datetime
 
 def get_active_window_name():
     """
     Gets the name of the currently active window.
     args: none
-    returns: none
+    returns:
+        description (str): the description of a .exe file (used as process "name")
     """
     time.sleep(1)
     try:
@@ -26,7 +29,7 @@ def get_active_window_name():
         language, codepage = win32api.GetFileVersionInfo(exe_path, '\\VarFileInfo\\Translation')[0]
         string_file_info = f'\\StringFileInfo\\{language:04x}{codepage:04x}\\FileDescription'
         
-        # Get the description
+        # Get the description (description gives a proper name, like "Microsoft Edge" instead of "msedge.exe")
         description = win32api.GetFileVersionInfo(exe_path, string_file_info)
         
         return description
@@ -43,6 +46,9 @@ def track_screen_time():
     """
     global usage_data
     usage_data = {}
+    
+    global weekly_data
+    weekly_data = {}
     
     last_app = None
     last_time = time.time()
@@ -69,6 +75,18 @@ def track_screen_time():
                     print(f"{app}: {seconds // 60:.0f} min {seconds % 60:.0f} sec")
 
                 time.sleep(1)  # Avoid duplicate prints within the same second}
+
+            # if new day
+            if datetime.datetime.now().time().replace(second=0, microsecond=0) == datetime.time(0,0):
+                weekly_data = {datetime.datetime.now().strftime('%d/%m'):sum(usage_data.values())}
+                
+                # save daily data to weekly.json, along with date
+                with open('weekly.json', 'w') as f:
+                    json.dump(weekly_data)
+
+                # clear daily storage
+                usage_data = {}
+                open("daily.json", 'w').close()
     
     except KeyboardInterrupt:
         print("\nStopped Tracking")
@@ -78,7 +96,8 @@ def track_screen_time():
 
 fig, ax = plt.subplots()
 
-def plot(frame, ax, usage_data):
+def plotdaily(frame, ax, usage_data):
+    
     x = usage_data.keys()
     y = usage_data.values()
 
@@ -95,7 +114,16 @@ def plot(frame, ax, usage_data):
 timeTrackingThread = threading.Thread(target=track_screen_time, daemon = True)
 timeTrackingThread.start()
 
-#print(usage_data)
-
-ani = animation.FuncAnimation(fig, functools.partial(plot, ax=ax, usage_data=usage_data))
+time.sleep(1)
+ani = animation.FuncAnimation(fig, functools.partial(plotdaily, ax=ax, usage_data=usage_data))
 plt.show()
+
+# with open('daily.json', 'w') as f:
+#     json.dump(sum(usage_data.values()), f)
+# usage_data = {}
+
+# on program close: save daily data to json (useful when computer is shut down)
+with open('daily.json', 'w') as f:
+    json.dump((usage_data), f)
+
+print("end")
