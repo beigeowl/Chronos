@@ -11,6 +11,7 @@ import psutil
 import win32gui
 import win32process
 import win32api
+import sys
 
 global usage_data
 usage_data = {}
@@ -38,7 +39,13 @@ class createApp(tk.Tk):
         #widgets
         self.menu = Menu(self)
 
-        self.mainloop()
+        self.protocol("WM_DELETE_WINDOW", self.quit)
+
+    def quit(self):
+        sys.exit()
+
+        
+        
 
 class Menu(ttk.Frame):
     def __init__(self, parent): 
@@ -80,7 +87,11 @@ class Menu(ttk.Frame):
         self.widget_placement() #calls placement
         
     
-        self.ani = animation.FuncAnimation(self.fig, self.plot, interval=20, blit = False)
+        # Start animation properly
+        self.ani = animation.FuncAnimation(self.fig, self.plot, interval=1000)
+
+        # Force an initial draw
+        self.canvas.draw()
     def widget_placement(self):
         #create grid 2x2
         self.rowconfigure((0,1), weight = 1)
@@ -100,7 +111,7 @@ class Menu(ttk.Frame):
             self.tracking = True
             self.track_thread = threading.Thread(target=self.track_screen_time, daemon=True) #tracking screen time in the background
             self.track_thread.start()
-        
+
     def stop_timer(self):
         print('stopped tracking')
         self.tracking = False
@@ -180,4 +191,6 @@ class Menu(ttk.Frame):
                     print(f"{app}: {seconds // 60:.0f} min {seconds % 60:.0f} sec")
 
 
-createApp()
+app = createApp()
+app.mainloop()
+print('done')
