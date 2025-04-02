@@ -1,17 +1,19 @@
 import tkinter as tk
-from tkinter import ttk #Themes
-from tkinter import messagebox #Pop up message windows
+from tkinter import ttk
+from tkinter import *
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import functools
+import threading
 import time
 import psutil
 import win32gui
 import win32process
-import threading
 import win32api
 
-
-
-
-
+global usage_data
+usage_data = {}
 class createApp(tk.Tk): 
      #creates an instance of the main window as a class, creates the main application window
      #Essentially the same thing as root = tk.Tk()
@@ -23,8 +25,8 @@ class createApp(tk.Tk):
         screen_height = self.winfo_screenheight()
         
         #App Theme (Imported)
-        self.tk.call("source", "C:/Users/benso/OneDrive/Desktop/Time Tracker App/TimeTracker/Azure-ttk-theme-main/azure.tcl") #use 'azure.tcl' when in the same file
-        self.tk.call("set_theme", "dark")
+        #self.tk.call("source", "C:/Users/benso/OneDrive/Desktop/Time Tracker App/TimeTracker/Azure-ttk-theme-main/azure.tcl") #use 'azure.tcl' when in the same file
+        #self.tk.call("set_theme", "dark")
 
 
         #Main Setup
@@ -49,7 +51,7 @@ class Menu(ttk.Frame):
         self.place(x=0,y=0, relwidth = 1, relheight = 1)
         #x and y determine widget position, starts from top left
         #relheight and relwidth - size relative to app size
-
+        self.usage_data = {}
         self.create_widget()
 
 
@@ -66,16 +68,26 @@ class Menu(ttk.Frame):
         
         self.entry = ttk.Entry(self, textvariable = 'subname')
         # self.entry.bind('<return>', self.process_widget)
-
+        self.graph_frame = tk.Frame(self, width = 500, height = 300)
+        self.graph_frame.grid(row=0, column = 1, padx = 20, pady=20)
+        self.fig, self.ax = plt.subplots()
+        self.ax.set_title("Time per App")
+        self.ax.set_xlabel("App")
+        self.ax.set_ylabel("Seconds")
+        self.canvas = FigureCanvasTkAgg(self.fig, master=self.graph_frame)
+        self.canvas.get_tk_widget().pack()
 
         self.widget_placement() #calls placement
-
+        
+    
+        self.ani = animation.FuncAnimation(self.fig, self.plot, interval=20, blit = False)
     def widget_placement(self):
         #create grid 2x2
         self.rowconfigure((0,1), weight = 1)
         self.columnconfigure((0,1),weight = 1)
 
         #place widgets
+        self.graph_frame.grid(row = 0, column = 0, sticky = "W")
         self.start_button.grid(row = 0, column = 0, sticky = 'N')
         self.stop_button.grid(row = 0, column = 0, sticky = 'S')
         self.menulabel.grid(column = 0, row = 1, columnspan = 2)
@@ -117,7 +129,14 @@ class Menu(ttk.Frame):
             return description
         except Exception:
             return None, None  # Return None if there's an issue
-
+    def plot(self, frame):
+        self.ax.clear()
+        x = usage_data.keys()
+        y = usage_data.values()
+        bars = self.ax.bar(x, y)
+        self.ax.bar_label(bars)
+        self.canvas.draw() 
+     
     def track_screen_time(self):
         """
         Tracks screen time for each app and prints the usage summary.
@@ -126,8 +145,7 @@ class Menu(ttk.Frame):
             app (string): name of a tracked app
             seconds (int): number of seconds an app has been open for
         """
-        global usage_data
-        usage_data = {}
+        
         
         last_app = None
         last_time = time.time()
@@ -141,7 +159,7 @@ class Menu(ttk.Frame):
                     current_time = time.time()
 
                     if int(current_time) % 2 == 0:
-                        time_spent = current_time - last_time
+                        time_spent = round(current_time - last_time, 0)
                         usage_data[last_app] = usage_data.get(last_app, 0) + time_spent
                         last_time = current_time
 
@@ -153,9 +171,6 @@ class Menu(ttk.Frame):
                     for app, seconds in usage_data.items():
                         print(f"{app}: {seconds // 60:.0f} min {seconds % 60:.0f} sec")
 
-                    # with open('times.json', 'w') as fp:
-                    #     json.dump(usage_data, fp)
-                    #     fp.flush()
                     time.sleep(1)  # Avoid duplicate prints within the same second}
         except Exception:
             if self.tracking:
@@ -164,13 +179,5 @@ class Menu(ttk.Frame):
                 for app, seconds in usage_data.items():
                     print(f"{app}: {seconds // 60:.0f} min {seconds % 60:.0f} sec")
 
-    
-
-    
-
-    # def format_time():
-
-
-        
 
 createApp()
