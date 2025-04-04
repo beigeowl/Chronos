@@ -21,13 +21,11 @@ usage_data_lock = threading.Lock()
 if not(os.path.exists("daily.json")):
     print("daily.json doesn't exist, creating now")
     g = open("daily.json", "w")
+    g.write("{}")
     g.close()
 
 with open("daily.json", "r") as file:
-    if len(file.readlines()) < 3:
-        usage_data = {}
-    else:    
-        usage_data = json.load(file)
+    usage_data = json.load(file)
 
 class createApp(tk.Tk):
     def __init__(self):
