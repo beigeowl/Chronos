@@ -19,7 +19,10 @@ usage_data = {}
 usage_data_lock = threading.Lock()
 
 with open("daily.json", "r") as file:
-    usage_data = json.load(file)
+    if len(file.readlines()) < 3:
+        usage_data = {}
+    else:    
+        usage_data = json.load(file)
 
 class createApp(tk.Tk):
     def __init__(self):
