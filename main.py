@@ -18,6 +18,11 @@ import json
 usage_data = {}
 usage_data_lock = threading.Lock()
 
+if not(os.path.exists("daily.json")):
+    print("daily.json doesn't exist, creating now")
+    g = open("daily.json", "w")
+    g.close()
+
 with open("daily.json", "r") as file:
     if len(file.readlines()) < 3:
         usage_data = {}
