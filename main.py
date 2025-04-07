@@ -16,6 +16,7 @@ import json
 
 # Global data and lock for thread safety
 usage_data = {}
+print(usage_data)
 usage_data_lock = threading.Lock()
 
 if not(os.path.exists("daily.json")):
@@ -26,6 +27,8 @@ if not(os.path.exists("daily.json")):
 
 with open("daily.json", "r") as file:
     usage_data = json.load(file)
+
+print(usage_data)
 
 class createApp(tk.Tk):
     def __init__(self):
@@ -44,8 +47,12 @@ class createApp(tk.Tk):
         image = Image.open("app.ico")
         menu = (pystray.MenuItem('Quit', self.quit_window), 
                 pystray.MenuItem('Show', self.show_window))
+                # ,pystray.MenuItem((f"Total: {Menu.totalTime() // 60:.0f} min {Menu.totalTime() % 60:.0f} sec"), self.e()))
         icon = pystray.Icon("name", image, "Chronos", menu)
         icon.run()
+
+    def e(self):
+        print()
 
     def quit_window(self, icon):
         self.onExit()
@@ -101,6 +108,7 @@ class Menu(ttk.Frame):
             y = list(usage_data.values())
         bars = self.ax.bar(x, y)
         self.ax.bar_label(bars)
+        self.ax.tick_params(axis='x', labelrotation=90)
         self.canvas.draw()
         self.after(1000, self.update_graph)
 
@@ -128,6 +136,11 @@ class Menu(ttk.Frame):
             return description
         except Exception:
             return None
+    
+    @staticmethod
+    def totalTime():
+        totalTime = sum(usage_data.values())
+        return totalTime
 
     def track_screen_time(self):      
         last_app = None
@@ -149,7 +162,9 @@ class Menu(ttk.Frame):
                     print("\nScreen Time Summary:")
                     for app, seconds in usage_data.items():
                         print(f"{app}: {seconds // 60:.0f} min {seconds % 60:.0f} sec")
-                time.sleep(1)
+
+                    print(f"Total: {self.totalTime() // 60:.0f} min {self.totalTime() % 60:.0f} sec")
+                    time.sleep(1)
         except Exception as e:
             print("Exception in tracking:", e)
 
