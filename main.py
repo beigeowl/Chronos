@@ -42,6 +42,12 @@ class createApp(tk.Tk):
         self.menu = Menu(self)
         self.protocol("WM_DELETE_WINDOW", self.minimize_to_tray)
 
+        #App Theme (Imported)
+        self.tk.call("source", "C:\\Users\\benso\\OneDrive\\Desktop\\Time Tracker App\\TimeTracker\\Azure-ttk-theme-main\\azure.tcl") #use 'azure.tcl' when in the same file
+        self.tk.call("set_theme", "dark")
+
+
+
     def minimize_to_tray(self):
         self.withdraw()
         image = Image.open("app.ico")
@@ -77,29 +83,97 @@ class Menu(ttk.Frame):
         self.create_widget()
 
     def create_widget(self):
-        self.start_button = ttk.Button(self, text='start', command=self.start_timer)
-        self.stop_button = ttk.Button(self, text='stop', command=self.stop_timer)
-        self.menulabel = tk.Label(self, text="Name", bg='red')
-        self.entry = ttk.Entry(self)
-        self.graph_frame = tk.Frame(self, width=500, height=300)
-        self.graph_frame.grid(row=0, column=1, padx=20, pady=20)
+        
+        #Grid Configure
+        self.rowconfigure(0, weight = 1)
+        self.rowconfigure(1, weight = 6)
+        self.columnconfigure((0,1), weight=1)
+
+        #Frames
+        self.leftframe = tk.Frame(self)
+        self.leftframe.grid(column = 0, row = 1)
+        self.leftframe.rowconfigure((0,3), weight = 1)
+        self.leftframe.columnconfigure(0, weight = 1)
+
+        self.rightframe = tk.Frame(self)
+        self.rightframe.grid(column = 1, row = 1)
+        self.rightframe.rowconfigure((0,4), weight = 1)
+        self.rightframe.columnconfigure(0, weight = 1)
+
+
+
+        #Title
+        self.title =  ttk.Label(self, text = 'Chronos', font = ("Helvetica", 35, "bold"))
+
+        #Left Frame
+        self.apptime = ttk.Label(self.rightframe, text = "App Time", font = ("Helvetica", 15, "bold"))
+        self.totaltime = ttk.Label(self.rightframe, text = "Total Time", font = ("Helvetica", 15, "bold"))
+        
+        self.applist = ttk.Treeview(self.rightframe, columns = ("App", "Time"), show = 'headings', height = 16)
+        self.applist.heading("App", text = "App")
+        self.applist.heading("Time", text = "Time")
+        self.scrollbar = ttk.Scrollbar(self.applist, orient="vertical", command=self.applist.yview)
+        self.applist.configure(yscrollcommand = self.scrollbar.set)
+        self.applist.columnconfigure(0, weight = 1)
+        self.applist.columnconfigure(1, weight = 0)
+        # self.applist.grid(column = 1 ,row = 0)
+        # self.scrollbar.grid(column = 1, row = 0, sticky = "E")
+
+
+        #Right Frame
+        self.screentime = ttk.Label(self.leftframe, text = "Screen Time", font = ("Helvetica", 15, "bold"))
+        self.start_button = ttk.Button(self.leftframe, text='Start', command=self.start_timer)
+        self.stop_button = ttk.Button(self.leftframe, text='Stop', command=self.stop_timer)
+        
+        #Graph
+        self.graph_frame = tk.Frame(self.leftframe)
+        # self.graph_frame.grid(row=0, column=1, padx=20, pady=20)
         self.fig, self.ax = plt.subplots()
         self.ax.set_title("Time per App")
         self.ax.set_xlabel("App")
         self.ax.set_ylabel("Seconds")
         self.canvas = FigureCanvasTkAgg(self.fig, master=self.graph_frame)
         self.canvas.get_tk_widget().pack()
+        
         self.widget_placement()
         self.update_graph()  # Start periodic update
 
     def widget_placement(self):
-        self.rowconfigure((0,1), weight=1)
-        self.columnconfigure((0,1), weight=1)
-        self.graph_frame.grid(row=0, column=0, sticky="W")
-        self.start_button.grid(row=0, column=0, sticky='N')
-        self.stop_button.grid(row=0, column=0, sticky='S')
-        self.menulabel.grid(column=0, row=1, columnspan=2)
-        self.entry.grid(column=1, row=0)
+
+        #Title
+        self.title.grid(row = 0, columnspan = 2, sticky = 'N')
+
+        #Left Frame
+        self.apptime.grid(row = 0, column = 0, pady = 10)
+        self.totaltime.grid(row = 2, column = 0,pady = 10)
+        self.applist.grid(row = 1, column = 0, pady = 10)
+
+        #Right Frame
+        self.screentime.grid(row = 0, column = 0, sticky = 'N', pady = (10,0))
+        self.graph_frame.grid(row = 2, column = 0, pady = 10)
+        self.start_button.grid(row=3, column=0, sticky='W', padx=10, pady=10)
+        self.stop_button.grid(row=3, column=0, sticky='E', padx=10, pady=10)
+    
+    def update_totaltime(self):
+        currentTot = self.totalTime()
+        hr = int(currentTot)//3600
+        min = int(currentTot)//60
+        sec = int(currentTot)%60
+        self.totaltime.config(text = f'Total Time = {hr}hr {min}m {sec}s')
+
+    def update_app_list(self):
+        # Clear current list
+        for item in self.applist.get_children():
+            self.applist.delete(item)
+
+        # Add current app times
+        with usage_data_lock:
+            for app, seconds in usage_data.items():
+                hours = int(seconds)//3600
+                minutes = int(seconds) // 60
+                secs = int(seconds) % 60
+                formatted_time = f"{hours}hr {minutes} min {secs} sec"
+                self.applist.insert('', 'end', values=(app, formatted_time))
 
     def update_graph(self):
         self.ax.clear()
@@ -110,6 +184,11 @@ class Menu(ttk.Frame):
         self.ax.bar_label(bars)
         self.ax.tick_params(axis='x', labelrotation=90)
         self.canvas.draw()
+
+        #Misc Updates
+        self.update_app_list()
+        self.update_totaltime()
+
         self.after(1000, self.update_graph)
 
     def start_timer(self):
