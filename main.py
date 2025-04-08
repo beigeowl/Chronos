@@ -43,8 +43,8 @@ class createApp(tk.Tk):
         self.protocol("WM_DELETE_WINDOW", self.minimize_to_tray)
 
         #App Theme (Imported)
-        self.tk.call("source", "C:\\Users\\benso\\OneDrive\\Desktop\\Time Tracker App\\TimeTracker\\Azure-ttk-theme-main\\azure.tcl") #use 'azure.tcl' when in the same file
-        self.tk.call("set_theme", "dark")
+        # self.tk.call("source", "C:\\Users\\benso\\OneDrive\\Desktop\\Time Tracker App\\TimeTracker\\Azure-ttk-theme-main\\azure.tcl") #use 'azure.tcl' when in the same file
+        # self.tk.call("set_theme", "dark")
 
 
 
@@ -80,6 +80,14 @@ class Menu(ttk.Frame):
         self.tracking = False
         super().__init__(parent)
         self.place(x=0, y=0, relwidth=1, relheight=1)
+
+        if not self.tracking:
+            print('Tracking started!')
+            self.tracking = True
+            self.track_thread = threading.Thread(target=self.track_screen_time, daemon=True)
+            self.track_thread.start()
+
+
         self.create_widget()
 
     def create_widget(self):
@@ -122,8 +130,8 @@ class Menu(ttk.Frame):
 
         #Right Frame
         self.screentime = ttk.Label(self.leftframe, text = "Screen Time", font = ("Helvetica", 15, "bold"))
-        self.start_button = ttk.Button(self.leftframe, text='Start', command=self.start_timer)
-        self.stop_button = ttk.Button(self.leftframe, text='Stop', command=self.stop_timer)
+        # self.start_button = ttk.Button(self.leftframe, text='Start', command=self.start_timer)
+        # self.stop_button = ttk.Button(self.leftframe, text='Stop', command=self.stop_timer)
         
         #Graph
         self.graph_frame = tk.Frame(self.leftframe)
@@ -151,8 +159,8 @@ class Menu(ttk.Frame):
         #Right Frame
         self.screentime.grid(row = 0, column = 0, sticky = 'N', pady = (10,0))
         self.graph_frame.grid(row = 2, column = 0, pady = 10)
-        self.start_button.grid(row=3, column=0, sticky='W', padx=10, pady=10)
-        self.stop_button.grid(row=3, column=0, sticky='E', padx=10, pady=10)
+        # self.start_button.grid(row=3, column=0, sticky='W', padx=10, pady=10)
+        # self.stop_button.grid(row=3, column=0, sticky='E', padx=10, pady=10)
     
     def update_totaltime(self):
         currentTot = self.totalTime()
@@ -190,17 +198,6 @@ class Menu(ttk.Frame):
         self.update_totaltime()
 
         self.after(1000, self.update_graph)
-
-    def start_timer(self):
-        if not self.tracking:
-            print('Tracking started!')
-            self.tracking = True
-            self.track_thread = threading.Thread(target=self.track_screen_time, daemon=True)
-            self.track_thread.start()
-
-    def stop_timer(self):
-        print('Stopped tracking')
-        self.tracking = False
 
     def get_active_window_name(self):
         time.sleep(1)
