@@ -165,9 +165,9 @@ class Menu(ttk.Frame):
     def update_totaltime(self):
         currentTot = self.totalTime()
         hr = int(currentTot)//3600
-        min = int(currentTot)//60
+        min = (int(currentTot)%3600)//60
         sec = int(currentTot)%60
-        self.totaltime.config(text = f'Total Time = {hr}hr {min}m {sec}s')
+        self.totaltime.config(text = f'Total Time = {hr}h {min}m {sec}s')
 
     def update_app_list(self):
         # Clear current list
