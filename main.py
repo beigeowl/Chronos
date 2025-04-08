@@ -46,8 +46,6 @@ class createApp(tk.Tk):
         # self.tk.call("source", "C:\\Users\\benso\\OneDrive\\Desktop\\Time Tracker App\\TimeTracker\\Azure-ttk-theme-main\\azure.tcl") #use 'azure.tcl' when in the same file
         # self.tk.call("set_theme", "dark")
 
-
-
     def minimize_to_tray(self):
         self.withdraw()
         image = Image.open("app.ico")
@@ -87,7 +85,6 @@ class Menu(ttk.Frame):
             self.track_thread = threading.Thread(target=self.track_screen_time, daemon=True)
             self.track_thread.start()
 
-
         self.create_widget()
 
     def create_widget(self):
@@ -108,8 +105,6 @@ class Menu(ttk.Frame):
         self.rightframe.rowconfigure((0,4), weight = 1)
         self.rightframe.columnconfigure(0, weight = 1)
 
-
-
         #Title
         self.title =  ttk.Label(self, text = 'Chronos', font = ("Helvetica", 35, "bold"))
 
@@ -126,7 +121,6 @@ class Menu(ttk.Frame):
         self.applist.columnconfigure(1, weight = 0)
         # self.applist.grid(column = 1 ,row = 0)
         # self.scrollbar.grid(column = 1, row = 0, sticky = "E")
-
 
         #Right Frame
         self.screentime = ttk.Label(self.leftframe, text = "Screen Time", font = ("Helvetica", 15, "bold"))
@@ -178,9 +172,9 @@ class Menu(ttk.Frame):
         with usage_data_lock:
             for app, seconds in usage_data.items():
                 hours = int(seconds)//3600
-                minutes = int(seconds) // 60
+                minutes = (int(seconds)%3600) // 60
                 secs = int(seconds) % 60
-                formatted_time = f"{hours}hr {minutes} min {secs} sec"
+                formatted_time = f"{hours}h {minutes} min {secs} sec"
                 self.applist.insert('', 'end', values=(app, formatted_time))
 
     def update_graph(self):
@@ -200,7 +194,7 @@ class Menu(ttk.Frame):
         self.after(1000, self.update_graph)
 
     def get_active_window_name(self):
-        time.sleep(1)
+        time.sleep(0.5)
         try:
             hwnd = win32gui.GetForegroundWindow()
             _, pid = win32process.GetWindowThreadProcessId(hwnd)
@@ -240,7 +234,7 @@ class Menu(ttk.Frame):
                         print(f"{app}: {seconds // 60:.0f} min {seconds % 60:.0f} sec")
 
                     print(f"Total: {self.totalTime() // 60:.0f} min {self.totalTime() % 60:.0f} sec")
-                    time.sleep(1)
+                    time.sleep(0.5)
         except Exception as e:
             print("Exception in tracking:", e)
 
