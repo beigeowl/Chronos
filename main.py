@@ -183,6 +183,7 @@ class Menu(ttk.Frame):
         bars = self.ax.bar(x, y)
         self.ax.bar_label(bars)
         self.ax.tick_params(axis='x', labelrotation=90)
+        plt.tight_layout()
         self.canvas.draw()
 
         #Misc Updates
