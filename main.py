@@ -13,6 +13,7 @@ import os
 import pystray
 from PIL import Image
 import json
+import datetime
 
 # Global data and lock for thread safety
 usage_data = {}
@@ -54,9 +55,6 @@ class createApp(tk.Tk):
                 # ,pystray.MenuItem((f"Total: {Menu.totalTime() // 60:.0f} min {Menu.totalTime() % 60:.0f} sec"), self.e()))
         icon = pystray.Icon("name", image, "Chronos", menu)
         icon.run()
-
-    def e(self):
-        print()
 
     def quit_window(self, icon):
         self.onExit()
@@ -216,7 +214,7 @@ class Menu(ttk.Frame):
         last_app = None
         last_time = time.time()
         try:
-            while self.tracking:
+            while self.tracking:                
                 current_app = self.get_active_window_name()
                 current_time = time.time()
                 if current_app:
@@ -234,7 +232,19 @@ class Menu(ttk.Frame):
                         print(f"{app}: {seconds // 60:.0f} min {seconds % 60:.0f} sec")
 
                     print(f"Total: {self.totalTime() // 60:.0f} min {self.totalTime() % 60:.0f} sec")
-                    time.sleep(0.5)
+                    time.sleep(0.5) 
+
+                if datetime.datetime.now().time().replace(second=0, microsecond=0) == datetime.time(0,0):
+
+                    print("new day")
+                    # clear the existing dict in place
+                    with usage_data_lock:
+                        usage_data.clear()
+
+                    # persist the empty state
+                    with open("daily.json", "w") as g:
+                        json.dump({}, g)
+                   
         except Exception as e:
             print("Exception in tracking:", e)
 
