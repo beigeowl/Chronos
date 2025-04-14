@@ -181,7 +181,6 @@ class Menu(ttk.Frame):
             x = list(usage_data.keys())
             y = list(usage_data.values())
         bars = self.ax.bar(x, y)
-        self.ax.bar_label(bars)
         self.ax.tick_params(axis='x', labelrotation=90)
         plt.tight_layout()
         self.canvas.draw()
@@ -193,18 +192,37 @@ class Menu(ttk.Frame):
         self.after(1000, self.update_graph)
 
     def get_active_window_name(self):
-        time.sleep(0.5)
+        hwnd = win32gui.GetForegroundWindow()
+        # get the owning PID
         try:
-            hwnd = win32gui.GetForegroundWindow()
             _, pid = win32process.GetWindowThreadProcessId(hwnd)
-            process = psutil.Process(pid)
-            exe_path = process.exe()
-            language, codepage = win32api.GetFileVersionInfo(exe_path, '\\VarFileInfo\\Translation')[0]
-            string_file_info = f'\\StringFileInfo\\{language:04x}{codepage:04x}\\FileDescription'
-            description = win32api.GetFileVersionInfo(exe_path, string_file_info)
-            return description
+            proc = psutil.Process(pid)
+            exe_path = proc.exe()
         except Exception:
-            return None
+            # could not even get a process – fallback to window title
+            return win32gui.GetWindowText(hwnd) or None
+
+        # 1) Try FileDescription
+        try:
+            # get the list of (lang, codepage) tuples
+            trans = win32api.GetFileVersionInfo(exe_path, '\\VarFileInfo\\Translation')
+            lang, codepage = trans[0]
+            str_path = f'\\StringFileInfo\\{lang:04x}{codepage:04x}\\FileDescription'
+            desc = win32api.GetFileVersionInfo(exe_path, str_path)
+            if desc and desc.strip():
+                return desc
+        except Exception as e:
+            # catch the 1813 or any other version‑info error
+            # (optional) print or log e if you want to debug
+            # print(f"no version-info for {exe_path}: {e}")
+            pass
+
+        # 2) Fallback to process name (without .exe)
+        try:
+            return os.path.splitext(proc.name())[0]
+        except Exception:
+            # 3) last fallback: window title
+            return win32gui.GetWindowText(hwnd) or None
     
     @staticmethod
     def totalTime():
@@ -233,7 +251,7 @@ class Menu(ttk.Frame):
                         print(f"{app}: {seconds // 60:.0f} min {seconds % 60:.0f} sec")
 
                     print(f"Total: {self.totalTime() // 60:.0f} min {self.totalTime() % 60:.0f} sec")
-                    time.sleep(0.5) 
+                time.sleep(1) 
 
                 if datetime.datetime.now().time().replace(second=0, microsecond=0) == datetime.time(0,0):
 
