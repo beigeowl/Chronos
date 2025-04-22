@@ -26,8 +26,20 @@ if not(os.path.exists("daily.json")):
     g.write("{}")
     g.close()
 
-with open("daily.json", "r") as file:
-    usage_data = json.load(file)
+if not(os.path.exists("date.txt")):
+    print("date.txt doesn't exist, creating new")
+    with open("date.txt", "w") as f:
+        f.write(f"{datetime.date.today()}")
+        f.close()
+
+with open("date.txt", "r") as h:
+    saved_date = h.readline()
+    h.close()
+
+if saved_date == str(datetime.date.today()):
+    with open("daily.json", "r") as file:
+        usage_data = json.load(file)
+        file.close()
 
 print(usage_data)
 
@@ -69,6 +81,11 @@ class createApp(tk.Tk):
     def onExit(self):
         with open('daily.json', 'w') as f:
             json.dump((usage_data), f)
+            f.close()
+
+        with open('date.txt', 'w') as g:
+            g.write(f"{datetime.date.today()}")
+            g.close()
         os._exit(0)
 
 class Menu(ttk.Frame):
@@ -263,6 +280,11 @@ class Menu(ttk.Frame):
                     # persist the empty state
                     with open("daily.json", "w") as g:
                         json.dump({}, g)
+                        g.close()
+
+                    with open('date.txt', 'w') as j:
+                        j.write(f"{datetime.date.today()}")
+                        j.close()
                    
         except Exception as e:
             print("Exception in tracking:", e)
