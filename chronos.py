@@ -230,7 +230,7 @@ class Menu(ttk.Frame):
             # could not even get a process – fallback to window title
             return win32gui.GetWindowText(hwnd) or None
 
-        # 1) Try FileDescription
+        # 1) Try FileDescription https://learn.microsoft.com/en-us/windows/win32/menurc/stringfileinfo-block
         try:
             # get the list of (lang, codepage) tuples
             trans = win32api.GetFileVersionInfo(exe_path, '\\VarFileInfo\\Translation')
