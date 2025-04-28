@@ -219,9 +219,11 @@ class Menu(ttk.Frame):
 
         self.after(1000, self.update_graph)
 
+    # https://askubuntu.com/questions/152191/getting-the-name-of-the-process-that-corresponds-to-the-active-window, https://psutil.readthedocs.io/en/latest/, https://github.com/mhammond/pywin32/blob/main/adodbapi/readme.txt
     def get_active_window_name(self):
+        # gets the active window handle
         hwnd = win32gui.GetForegroundWindow()
-        # get the owning PID
+        # get the PID of the active window
         try:
             _, pid = win32process.GetWindowThreadProcessId(hwnd)
             proc = psutil.Process(pid)
@@ -230,7 +232,8 @@ class Menu(ttk.Frame):
             # could not even get a process – fallback to window title
             return win32gui.GetWindowText(hwnd) or None
 
-        # 1) Try FileDescription https://learn.microsoft.com/en-us/windows/win32/menurc/stringfileinfo-block
+        # try to get the FileDescription of a processhttps://learn.microsoft.com/en-us/windows/win32/menurc/stringfileinfo-block
+        # this gives the most user friendly name for a given process. For example, for microsoft edge, it'll show "Microsoft Edge", while the process name gives "msedge" or "msedge.exe" and the window title includes the name of the active tab
         try:
             # get the list of (lang, codepage) tuples
             trans = win32api.GetFileVersionInfo(exe_path, '\\VarFileInfo\\Translation')
@@ -241,15 +244,13 @@ class Menu(ttk.Frame):
                 return desc
         except Exception as e:
             # catch the 1813 or any other version‑info error
-            # (optional) print or log e if you want to debug
-            # print(f"no version-info for {exe_path}: {e}")
             pass
 
-        # 2) Fallback to process name (without .exe)
+        # Fallback to process name (without .exe)
         try:
             return os.path.splitext(proc.name())[0]
         except Exception:
-            # 3) last fallback: window title
+            last fallback: window title
             return win32gui.GetWindowText(hwnd) or None
     
     @staticmethod
@@ -262,6 +263,7 @@ class Menu(ttk.Frame):
         last_time = time.time()
         try:
             while self.tracking:                
+                # current app is defined by the name of the active window whether that be the file description, process name, or window title
                 current_app = self.get_active_window_name()
                 current_time = time.time()
                 if current_app:
@@ -272,7 +274,7 @@ class Menu(ttk.Frame):
                     last_time = current_time
                     last_app = current_app
 
-                # Optional: print the summary
+                # print the summary
                 with usage_data_lock:
                     print("\nScreen Time Summary:")
                     for app, seconds in usage_data.items():
@@ -281,6 +283,7 @@ class Menu(ttk.Frame):
                     print(f"Total: {self.totalTime() // 60:.0f} min {self.totalTime() % 60:.0f} sec")
                 time.sleep(1) 
 
+                # if the time is 00:00 system time (new day)
                 if datetime.datetime.now().time().replace(second=0, microsecond=0) == datetime.time(0,0):
 
                     print("new day")
@@ -293,6 +296,7 @@ class Menu(ttk.Frame):
                         json.dump({}, g)
                         g.close()
 
+                    # update the date
                     with open('date.txt', 'w') as j:
                         j.write(f"{datetime.date.today()}")
                         j.close()
@@ -302,4 +306,3 @@ class Menu(ttk.Frame):
 
 app = createApp()
 app.mainloop()
-print('done')
