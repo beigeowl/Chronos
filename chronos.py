@@ -15,11 +15,12 @@ from PIL import Image
 import json
 import datetime
 
-# Global data and lock for thread safety
+# Global data and lock for thread safety: there are 2 threads accessing usage_data at the same time which can cause errors without the lock https://realpython.com/python-thread-lock/
 usage_data = {}
 print(usage_data)
 usage_data_lock = threading.Lock()
 
+# creates necessary files if they don't exist
 if not(os.path.exists("daily.json")):
     print("daily.json doesn't exist, creating now")
     g = open("daily.json", "w")
@@ -32,6 +33,7 @@ if not(os.path.exists("date.txt")):
         f.write(f"{datetime.date.today()}")
         f.close()
 
+# clears the saved time if it is a new day. If not a new day, the saved times are loaded into the program
 with open("date.txt", "r") as h:
     saved_date = h.readline()
     h.close()
@@ -43,6 +45,7 @@ if saved_date == str(datetime.date.today()):
 
 print(usage_data)
 
+# creates the window for the app
 class createApp(tk.Tk):
     def __init__(self):
         super().__init__()
@@ -53,12 +56,15 @@ class createApp(tk.Tk):
         self.state('zoomed')
         self.minsize(int(screen_width/2), int(screen_height/2))
         self.menu = Menu(self)
+        
+        # when the x is clicked to close the window, it triggers a function instead (minimizes to tray) https://stackoverflow.com/questions/45726304/protocols-in-tkinter-in-python
         self.protocol("WM_DELETE_WINDOW", self.minimize_to_tray)
 
         #App Theme (Imported)
         # self.tk.call("source", "C:\\Users\\benso\\OneDrive\\Desktop\\Time Tracker App\\TimeTracker\\Azure-ttk-theme-main\\azure.tcl") #use 'azure.tcl' when in the same file
         # self.tk.call("set_theme", "dark")
 
+    # When the app is minimized to the tray, it can either be fully exited by clicking quit or be shown again. https://www.pythontutorial.net/tkinter/tkinter-system-tray/
     def minimize_to_tray(self):
         self.withdraw()
         image = Image.open("app.ico")
@@ -78,6 +84,7 @@ class createApp(tk.Tk):
         icon.stop()
         self.after(0,self.deiconify)
 
+    # when the app is fully exited, it dumps the screen time data, as well as the date
     def onExit(self):
         with open('daily.json', 'w') as f:
             json.dump((usage_data), f)
@@ -94,9 +101,12 @@ class Menu(ttk.Frame):
         super().__init__(parent)
         self.place(x=0, y=0, relwidth=1, relheight=1)
 
+        # starts the screen time tracking when the app is opened
         if not self.tracking:
             print('Tracking started!')
             self.tracking = True
+            
+            # creates a separate thread for the tracking such that the graph and the tracking can occur and update simultaneously https://docs.python.org/3/library/threading.html, https://stackoverflow.com/questions/18864859/executing-multiple-functions-simultaneously
             self.track_thread = threading.Thread(target=self.track_screen_time, daemon=True)
             self.track_thread.start()
 
@@ -192,6 +202,7 @@ class Menu(ttk.Frame):
                 formatted_time = f"{hours}h {minutes} min {secs} sec"
                 self.applist.insert('', 'end', values=(app, formatted_time))
 
+    # redraws the graph every second
     def update_graph(self):
         self.ax.clear()
         with usage_data_lock:
