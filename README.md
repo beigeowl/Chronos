@@ -7,8 +7,12 @@ It graphs and lists screen time usage per app, across a day.\
 When the interface is closed, it minimizes to the system tray and continues to track screen time.
 
 # Installation
-Ensure the entire repo is downloaded, they are all necessary for program function\
-Run `pip install -r requirements.txt` to install packages
+Ensure the entire repo is downloaded, every file is necessary for program function\
+
+To run Chronos as a Python file, you'll need to create a virtual environment (venv)\
+From your terminal of choice, activate the venv (https://docs.python.org/3/library/venv.html)
+
+Run `pip install -r requirements.txt` to install all packages
 
 ## .exe compilation
 If the program is to be run at startup, and as a .exe file, run `pyinstaller --onefile --windowed chronos.py` to compile the code into a .exe\
