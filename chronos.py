@@ -250,7 +250,7 @@ class Menu(ttk.Frame):
         try:
             return os.path.splitext(proc.name())[0]
         except Exception:
-            last fallback: window title
+            # last fallback: window title
             return win32gui.GetWindowText(hwnd) or None
     
     @staticmethod
