@@ -48,7 +48,10 @@ print(usage_data)
 # creates the window for the app
 class createApp(tk.Tk):
     def __init__(self):
+        #Uses super().__init__() to ensure that other classes can inherit from the parent class, as Tkinter uses a hierarchy based system
         super().__init__()
+        
+        #assigning attributes to the program: Title, Startup size, State
         screen_width = self.winfo_screenwidth()
         screen_height = self.winfo_screenheight()
         self.title('Chronos')
@@ -60,17 +63,12 @@ class createApp(tk.Tk):
         # when the x is clicked to close the window, it triggers a function instead (minimizes to tray) https://stackoverflow.com/questions/45726304/protocols-in-tkinter-in-python
         self.protocol("WM_DELETE_WINDOW", self.minimize_to_tray)
 
-        #App Theme (Imported)
-        # self.tk.call("source", "C:\\Users\\benso\\OneDrive\\Desktop\\Time Tracker App\\TimeTracker\\Azure-ttk-theme-main\\azure.tcl") #use 'azure.tcl' when in the same file
-        # self.tk.call("set_theme", "dark")
-
     # When the app is minimized to the tray, it can either be fully exited by clicking quit or be shown again. https://www.pythontutorial.net/tkinter/tkinter-system-tray/
     def minimize_to_tray(self):
         self.withdraw()
         image = Image.open("app.ico")
         menu = (pystray.MenuItem('Quit', self.quit_window), 
                 pystray.MenuItem('Show', self.show_window))
-                # ,pystray.MenuItem((f"Total: {Menu.totalTime() // 60:.0f} min {Menu.totalTime() % 60:.0f} sec"), self.e()))
         icon = pystray.Icon("name", image, "Chronos", menu)
         icon.run()
 
@@ -95,10 +93,13 @@ class createApp(tk.Tk):
             g.close()
         os._exit(0)
 
+#A menu class that inherits from the parent class, essentially oversees the entirety of everything that occurs inside the tkinter window
 class Menu(ttk.Frame):
     def __init__(self, parent):
         self.tracking = False
         super().__init__(parent)
+
+        #Establishes a 2d plane from the top left to organize and allow for widget placement
         self.place(x=0, y=0, relwidth=1, relheight=1)
 
         # starts the screen time tracking when the app is opened
@@ -112,14 +113,17 @@ class Menu(ttk.Frame):
 
         self.create_widget()
 
+    #Initializes the widgets in one function, assigning its attrubutes except for its location
     def create_widget(self):
         
-        #Grid Configure
+        #Grid Configure, Organizes the 2d plane, changing 
         self.rowconfigure(0, weight = 1)
         self.rowconfigure(1, weight = 6)
         self.columnconfigure((0,1), weight=1)
 
-        #Frames
+        #FRAMES, 
+
+        #Left Frame
         self.leftframe = tk.Frame(self)
         self.leftframe.grid(column = 0, row = 1)
         self.leftframe.rowconfigure((0,3), weight = 1)
