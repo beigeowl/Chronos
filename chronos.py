@@ -195,7 +195,8 @@ class Menu(ttk.Frame):
 
         # Add current app times
         with usage_data_lock:
-            for app, seconds in usage_data.items():
+            S_usage_data = dict(sorted(usage_data.items(), key=lambda item: item[1], reverse=True))
+            for app, seconds in S_usage_data.items():
                 hours = int(seconds)//3600
                 minutes = (int(seconds)%3600) // 60
                 secs = int(seconds) % 60
@@ -205,9 +206,10 @@ class Menu(ttk.Frame):
     # redraws the graph every second
     def update_graph(self):
         self.ax.clear()
+        S_usage_data = dict(sorted(usage_data.items(), key=lambda item: item[1], reverse=True))
         with usage_data_lock:
-            x = list(usage_data.keys())
-            y = list(usage_data.values())
+            x = list(S_usage_data.keys())
+            y = list(S_usage_data.values())
         bars = self.ax.bar(x, y)
         self.ax.tick_params(axis='x', labelrotation=90)
         plt.tight_layout()
