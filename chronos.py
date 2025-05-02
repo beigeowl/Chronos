@@ -116,31 +116,32 @@ class Menu(ttk.Frame):
     #Initializes the widgets in one function, assigning its attrubutes except for its location
     def create_widget(self):
         
-        #Grid Configure, Organizes the 2d plane, changing 
+        #Grid Configure, Organizes the 2d plane, making it a 2 x 2 grid, the 2nd row having a greater size
         self.rowconfigure(0, weight = 1)
         self.rowconfigure(1, weight = 6)
         self.columnconfigure((0,1), weight=1)
 
-        #FRAMES, 
+        #FRAMES, initializing frames into the following grid boxes (0,1), (1,1), for further and more precise widget placement, frames are widgets themselves, however they can be treated like a mini window
 
-        #Left Frame
+        #Left Frame, set up for further grid placement within the frame, 1 x 3
         self.leftframe = tk.Frame(self)
         self.leftframe.grid(column = 0, row = 1)
         self.leftframe.rowconfigure((0,3), weight = 1)
         self.leftframe.columnconfigure(0, weight = 1)
 
+        #Right Frame, set up for further grid placement within the frame, 1 x 5
         self.rightframe = tk.Frame(self)
         self.rightframe.grid(column = 1, row = 1)
         self.rightframe.rowconfigure((0,4), weight = 1)
         self.rightframe.columnconfigure(0, weight = 1)
 
-        #Title
+        #Title, with assigned attributes
         self.title =  ttk.Label(self, text = 'Chronos', font = ("Helvetica", 35, "bold"))
 
-        #Left Frame
+        #Left Frame Widgets
         self.apptime = ttk.Label(self.rightframe, text = "App Time", font = ("Helvetica", 15, "bold"))
         self.totaltime = ttk.Label(self.rightframe, text = "Total Time", font = ("Helvetica", 15, "bold"))
-        
+        #Attributes for the list (Treeview) including headings and size, https://tkdocs.com/tutorial/tree.html
         self.applist = ttk.Treeview(self.rightframe, columns = ("App", "Time"), show = 'headings', height = 16)
         self.applist.heading("App", text = "App")
         self.applist.heading("Time", text = "Time")
@@ -148,17 +149,12 @@ class Menu(ttk.Frame):
         self.applist.configure(yscrollcommand = self.scrollbar.set)
         self.applist.columnconfigure(0, weight = 1)
         self.applist.columnconfigure(1, weight = 0)
-        # self.applist.grid(column = 1 ,row = 0)
-        # self.scrollbar.grid(column = 1, row = 0, sticky = "E")
 
-        #Right Frame
+        #Right Frame Widgets
         self.screentime = ttk.Label(self.leftframe, text = "Screen Time", font = ("Helvetica", 15, "bold"))
-        # self.start_button = ttk.Button(self.leftframe, text='Start', command=self.start_timer)
-        # self.stop_button = ttk.Button(self.leftframe, text='Stop', command=self.stop_timer)
         
         #Graph
         self.graph_frame = tk.Frame(self.leftframe)
-        # self.graph_frame.grid(row=0, column=1, padx=20, pady=20)
         self.fig, self.ax = plt.subplots()
         self.ax.set_title("Time per App")
         self.ax.set_xlabel("App")
@@ -166,9 +162,10 @@ class Menu(ttk.Frame):
         self.canvas = FigureCanvasTkAgg(self.fig, master=self.graph_frame)
         self.canvas.get_tk_widget().pack()
         
-        self.widget_placement()
+        self.widget_placement() # Calls to place the widgets
         self.update_graph()  # Start periodic update
 
+    #determining coordinate placement for each widget
     def widget_placement(self):
 
         #Title
@@ -182,9 +179,8 @@ class Menu(ttk.Frame):
         #Right Frame
         self.screentime.grid(row = 0, column = 0, sticky = 'N', pady = (10,0))
         self.graph_frame.grid(row = 2, column = 0, pady = 10)
-        # self.start_button.grid(row=3, column=0, sticky='W', padx=10, pady=10)
-        # self.stop_button.grid(row=3, column=0, sticky='E', padx=10, pady=10)
-    
+
+    #Updating total time, enabling for the xh ym zs format
     def update_totaltime(self):
         currentTot = self.totalTime()
         hr = int(currentTot)//3600
@@ -192,12 +188,13 @@ class Menu(ttk.Frame):
         sec = int(currentTot)%60
         self.totaltime.config(text = f'Total Time = {hr}h {min}m {sec}s')
 
+    #Updating table times
     def update_app_list(self):
         # Clear current list
         for item in self.applist.get_children():
             self.applist.delete(item)
 
-        # Add current app times
+        # Add current app times, xh ym zs
         with usage_data_lock:
             S_usage_data = dict(sorted(usage_data.items(), key=lambda item: item[1], reverse=True))
             for app, seconds in S_usage_data.items():
@@ -219,7 +216,7 @@ class Menu(ttk.Frame):
         plt.tight_layout()
         self.canvas.draw()
 
-        #Misc Updates
+        #Misc Updates, to ensure consistent pacing across all updates
         self.update_app_list()
         self.update_totaltime()
 
