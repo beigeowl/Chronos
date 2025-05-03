@@ -213,7 +213,7 @@ class Menu(ttk.Frame):
             y = list(S_usage_data.values())
         bars = self.ax.bar(x, y)
         self.ax.tick_params(axis='x', labelrotation=90)
-        plt.tight_layout()
+        plt.tight_layout()#https://www.geeksforgeeks.org/matplotlib-pyplot-tight_layout-in-python/
         self.canvas.draw()
 
         #Misc Updates, to ensure consistent pacing across all updates
