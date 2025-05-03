@@ -196,7 +196,7 @@ class Menu(ttk.Frame):
 
         # Add current app times, xh ym zs
         with usage_data_lock:
-            S_usage_data = dict(sorted(usage_data.items(), key=lambda item: item[1], reverse=True))
+            S_usage_data = dict(sorted(usage_data.items(), key=lambda item: item[1], reverse=True))# taken from https://stackoverflow.com/questions/613183/how-do-i-sort-a-dictionary-by-value
             for app, seconds in S_usage_data.items():
                 hours = int(seconds)//3600
                 minutes = (int(seconds)%3600) // 60
