@@ -93,7 +93,7 @@ class createApp(tk.Tk):
             g.close()
         os._exit(0)
 
-#A menu class that inherits from the parent class, essentially oversees the entirety of everything that occurs inside the tkinter window
+#A menu class that inherits from the parent class, essentially oversees the entirety of everything that occurs inside the tkinter window ,https://www.youtube.com/watch?v=eaxPK9VIkFM
 class Menu(ttk.Frame):
     def __init__(self, parent):
         self.tracking = False
@@ -116,29 +116,29 @@ class Menu(ttk.Frame):
     #Initializes the widgets in one function, assigning its attrubutes except for its location
     def create_widget(self):
         
-        #Grid Configure, Organizes the 2d plane, making it a 2 x 2 grid, the 2nd row having a greater size
+        #Grid Configure, Organizes the 2d plane, making it a 2 x 2 grid, the 2nd row having a greater size, https://www.pythonguis.com/tutorials/create-ui-with-tkinter-grid-layout-manager/
         self.rowconfigure(0, weight = 1)
         self.rowconfigure(1, weight = 6)
         self.columnconfigure((0,1), weight=1)
 
         #FRAMES, initializing frames into the following grid boxes (0,1), (1,1), for further and more precise widget placement, frames are widgets themselves, however they can be treated like a mini window
 
-        #Left Frame, set up for further grid placement within the frame, 1 x 3
+        #Left Frame, set up for further grid placement within the frame, 1 x 3, https://www.studytonight.com/tkinter/python-tkinter-widgets
         self.leftframe = tk.Frame(self)
         self.leftframe.grid(column = 0, row = 1)
         self.leftframe.rowconfigure((0,3), weight = 1)
         self.leftframe.columnconfigure(0, weight = 1)
 
-        #Right Frame, set up for further grid placement within the frame, 1 x 5
+        #Right Frame, set up for further grid placement within the frame, 1 x 5, https://www.studytonight.com/tkinter/python-tkinter-widgets
         self.rightframe = tk.Frame(self)
         self.rightframe.grid(column = 1, row = 1)
         self.rightframe.rowconfigure((0,4), weight = 1)
         self.rightframe.columnconfigure(0, weight = 1)
 
-        #Title, with assigned attributes
+        #Title, with assigned attributes, https://www.studytonight.com/tkinter/python-tkinter-widgets
         self.title =  ttk.Label(self, text = 'Chronos', font = ("Helvetica", 35, "bold"))
 
-        #Left Frame Widgets
+        #Left Frame Widgets, https://www.studytonight.com/tkinter/python-tkinter-widgets
         self.apptime = ttk.Label(self.rightframe, text = "App Time", font = ("Helvetica", 15, "bold"))
         self.totaltime = ttk.Label(self.rightframe, text = "Total Time", font = ("Helvetica", 15, "bold"))
         #Attributes for the list (Treeview) including headings and size, https://tkdocs.com/tutorial/tree.html
@@ -150,7 +150,7 @@ class Menu(ttk.Frame):
         self.applist.columnconfigure(0, weight = 1)
         self.applist.columnconfigure(1, weight = 0)
 
-        #Right Frame Widgets
+        #Right Frame Widgets, https://dev.to/shadowclaw11/list-of-widgets-in-tkinter-5b4n?comments_sort=latest
         self.screentime = ttk.Label(self.leftframe, text = "Screen Time", font = ("Helvetica", 15, "bold"))
         
         #Graph
@@ -165,7 +165,7 @@ class Menu(ttk.Frame):
         self.widget_placement() # Calls to place the widgets
         self.update_graph()  # Start periodic update
 
-    #determining coordinate placement for each widget
+    #determining coordinate placement for each widget, https://www.pythonguis.com/tutorials/create-ui-with-tkinter-grid-layout-manager/
     def widget_placement(self):
 
         #Title
