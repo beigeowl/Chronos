@@ -17,7 +17,7 @@ import datetime
 
 # Global data and lock for thread safety: there are 2 threads accessing usage_data at the same time which can cause errors without the lock https://realpython.com/python-thread-lock/
 usage_data = {}
-print(usage_data)
+
 usage_data_lock = threading.Lock()
 
 # creates necessary files if they don't exist
@@ -42,8 +42,6 @@ if saved_date == str(datetime.date.today()):
     with open("daily.json", "r") as file:
         usage_data = json.load(file)
         file.close()
-
-print(usage_data)
 
 # creates the window for the app
 class createApp(tk.Tk):
