@@ -139,7 +139,7 @@ class Menu(ttk.Frame):
         #Left Frame Widgets,[8]
         self.apptime = ttk.Label(self.rightframe, text = "App Time", font = ("Helvetica", 15, "bold"))
         self.totaltime = ttk.Label(self.rightframe, text = "Total Time", font = ("Helvetica", 15, "bold"))
-        #Attributes for the list (Treeview) including headings and size, [12]
+        #Attributes for the list (Treeview) including headings and size, [9]
         self.applist = ttk.Treeview(self.rightframe, columns = ("App", "Time"), show = 'headings', height = 16)
         self.applist.heading("App", text = "App")
         self.applist.heading("Time", text = "Time")
@@ -148,7 +148,7 @@ class Menu(ttk.Frame):
         self.applist.columnconfigure(0, weight = 1)
         self.applist.columnconfigure(1, weight = 0)
 
-        #Right Frame Widgets, [13]
+        #Right Frame Widgets, [10]
         self.screentime = ttk.Label(self.leftframe, text = "Screen Time", font = ("Helvetica", 15, "bold"))
         
         #Graph
@@ -163,7 +163,7 @@ class Menu(ttk.Frame):
         self.widget_placement() # Calls to place the widgets
         self.update_graph()  # Start periodic update
 
-    #determining coordinate placement for each widget, [14]
+    #determining coordinate placement for each widget, [7]
     def widget_placement(self):
 
         #Title
@@ -194,7 +194,7 @@ class Menu(ttk.Frame):
 
         # Add current app times, xh ym zs
         with usage_data_lock:
-            S_usage_data = dict(sorted(usage_data.items(), key=lambda item: item[1], reverse=True))#[15]
+            S_usage_data = dict(sorted(usage_data.items(), key=lambda item: item[1], reverse=True))#[11]
             for app, seconds in S_usage_data.items():
                 hours = int(seconds)//3600
                 minutes = (int(seconds)%3600) // 60
@@ -205,13 +205,13 @@ class Menu(ttk.Frame):
     # redraws the graph every second
     def update_graph(self):
         self.ax.clear()
-        S_usage_data = dict(sorted(usage_data.items(), key=lambda item: item[1], reverse=True))
+        S_usage_data = dict(sorted(usage_data.items(), key=lambda item: item[1], reverse=True))#[11]
         with usage_data_lock:
             x = list(S_usage_data.keys())
             y = list(S_usage_data.values())
         bars = self.ax.bar(x, y)
         self.ax.tick_params(axis='x', labelrotation=90)
-        plt.tight_layout()#[10]
+        plt.tight_layout()#[12]
         self.canvas.draw()
 
         #Misc Updates, to ensure consistent pacing across all updates
@@ -220,7 +220,7 @@ class Menu(ttk.Frame):
 
         self.after(1000, self.update_graph)
 
-    #[11], [12], [13]
+    #[13], [14], [15]
     def get_active_window_name(self):
         # gets the active window handle
         hwnd = win32gui.GetForegroundWindow()
@@ -233,7 +233,7 @@ class Menu(ttk.Frame):
             # could not even get a process – fallback to window title
             return win32gui.GetWindowText(hwnd) or None
 
-        # try to get the FileDescription of a process [14]
+        # try to get the FileDescription of a process [16]
         # this gives the most user friendly name for a given process. For example, for microsoft edge, it'll show "Microsoft Edge", while the process name gives "msedge" or "msedge.exe" and the window title includes the name of the active tab
         try:
             # get the list of (lang, codepage) tuples
