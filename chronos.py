@@ -15,7 +15,7 @@ from PIL import Image
 import json
 import datetime
 
-# Global data and lock for thread safety: there are 2 threads accessing usage_data at the same time which can cause errors without the lock https://realpython.com/python-thread-lock/
+# Global data and lock for thread safety: there are 2 threads accessing usage_data at the same time which can cause errors without the lock[1]
 usage_data = {}
 
 usage_data_lock = threading.Lock()
@@ -58,10 +58,10 @@ class createApp(tk.Tk):
         self.minsize(int(screen_width/2), int(screen_height/2))
         self.menu = Menu(self)
         
-        # when the x is clicked to close the window, it triggers a function instead (minimizes to tray) https://stackoverflow.com/questions/45726304/protocols-in-tkinter-in-python
+        # when the x is clicked to close the window, it triggers a function instead (minimizes to tray) [2]
         self.protocol("WM_DELETE_WINDOW", self.minimize_to_tray)
 
-    # When the app is minimized to the tray, it can either be fully exited by clicking quit or be shown again. https://www.pythontutorial.net/tkinter/tkinter-system-tray/
+    # When the app is minimized to the tray, it can either be fully exited by clicking quit or be shown again. [3]
     def minimize_to_tray(self):
         self.withdraw()
         image = Image.open("app.ico")
@@ -91,7 +91,7 @@ class createApp(tk.Tk):
             g.close()
         os._exit(0)
 
-#A menu class that inherits from the parent class, essentially oversees the entirety of everything that occurs inside the tkinter window ,https://www.youtube.com/watch?v=eaxPK9VIkFM
+#A menu class that inherits from the parent class, essentially oversees the entirety of everything that occurs inside the tkinter window [4]
 class Menu(ttk.Frame):
     def __init__(self, parent):
         self.tracking = False
@@ -105,7 +105,7 @@ class Menu(ttk.Frame):
             print('Tracking started!')
             self.tracking = True
             
-            # creates a separate thread for the tracking such that the graph and the tracking can occur and update simultaneously https://docs.python.org/3/library/threading.html, https://stackoverflow.com/questions/18864859/executing-multiple-functions-simultaneously
+            # creates a separate thread for the tracking such that the graph and the tracking can occur and update simultaneously [5], [6]
             self.track_thread = threading.Thread(target=self.track_screen_time, daemon=True)
             self.track_thread.start()
 
@@ -114,32 +114,32 @@ class Menu(ttk.Frame):
     #Initializes the widgets in one function, assigning its attrubutes except for its location
     def create_widget(self):
         
-        #Grid Configure, Organizes the 2d plane, making it a 2 x 2 grid, the 2nd row having a greater size, https://www.pythonguis.com/tutorials/create-ui-with-tkinter-grid-layout-manager/
+        #Grid Configure, Organizes the 2d plane, making it a 2 x 2 grid, the 2nd row having a greater size [7]
         self.rowconfigure(0, weight = 1)
         self.rowconfigure(1, weight = 6)
         self.columnconfigure((0,1), weight=1)
 
         #FRAMES, initializing frames into the following grid boxes (0,1), (1,1), for further and more precise widget placement, frames are widgets themselves, however they can be treated like a mini window
 
-        #Left Frame, set up for further grid placement within the frame, 1 x 3, https://www.studytonight.com/tkinter/python-tkinter-widgets
+        #Left Frame, set up for further grid placement within the frame, 1 x 3, [8]
         self.leftframe = tk.Frame(self)
         self.leftframe.grid(column = 0, row = 1)
         self.leftframe.rowconfigure((0,3), weight = 1)
         self.leftframe.columnconfigure(0, weight = 1)
 
-        #Right Frame, set up for further grid placement within the frame, 1 x 5, https://www.studytonight.com/tkinter/python-tkinter-widgets
+        #Right Frame, set up for further grid placement within the frame, 1 x 5, [9]
         self.rightframe = tk.Frame(self)
         self.rightframe.grid(column = 1, row = 1)
         self.rightframe.rowconfigure((0,4), weight = 1)
         self.rightframe.columnconfigure(0, weight = 1)
 
-        #Title, with assigned attributes, https://www.studytonight.com/tkinter/python-tkinter-widgets
+        #Title, with assigned attributes [10]
         self.title =  ttk.Label(self, text = 'Chronos', font = ("Helvetica", 35, "bold"))
 
-        #Left Frame Widgets, https://www.studytonight.com/tkinter/python-tkinter-widgets
+        #Left Frame Widgets,[11]
         self.apptime = ttk.Label(self.rightframe, text = "App Time", font = ("Helvetica", 15, "bold"))
         self.totaltime = ttk.Label(self.rightframe, text = "Total Time", font = ("Helvetica", 15, "bold"))
-        #Attributes for the list (Treeview) including headings and size, https://tkdocs.com/tutorial/tree.html
+        #Attributes for the list (Treeview) including headings and size, [12]
         self.applist = ttk.Treeview(self.rightframe, columns = ("App", "Time"), show = 'headings', height = 16)
         self.applist.heading("App", text = "App")
         self.applist.heading("Time", text = "Time")
@@ -148,7 +148,7 @@ class Menu(ttk.Frame):
         self.applist.columnconfigure(0, weight = 1)
         self.applist.columnconfigure(1, weight = 0)
 
-        #Right Frame Widgets, https://dev.to/shadowclaw11/list-of-widgets-in-tkinter-5b4n?comments_sort=latest
+        #Right Frame Widgets, [13]
         self.screentime = ttk.Label(self.leftframe, text = "Screen Time", font = ("Helvetica", 15, "bold"))
         
         #Graph
@@ -163,7 +163,7 @@ class Menu(ttk.Frame):
         self.widget_placement() # Calls to place the widgets
         self.update_graph()  # Start periodic update
 
-    #determining coordinate placement for each widget, https://www.pythonguis.com/tutorials/create-ui-with-tkinter-grid-layout-manager/
+    #determining coordinate placement for each widget, [14]
     def widget_placement(self):
 
         #Title
@@ -194,7 +194,7 @@ class Menu(ttk.Frame):
 
         # Add current app times, xh ym zs
         with usage_data_lock:
-            S_usage_data = dict(sorted(usage_data.items(), key=lambda item: item[1], reverse=True))# taken from https://stackoverflow.com/questions/613183/how-do-i-sort-a-dictionary-by-value
+            S_usage_data = dict(sorted(usage_data.items(), key=lambda item: item[1], reverse=True))#[15]
             for app, seconds in S_usage_data.items():
                 hours = int(seconds)//3600
                 minutes = (int(seconds)%3600) // 60
@@ -211,7 +211,7 @@ class Menu(ttk.Frame):
             y = list(S_usage_data.values())
         bars = self.ax.bar(x, y)
         self.ax.tick_params(axis='x', labelrotation=90)
-        plt.tight_layout()#https://www.geeksforgeeks.org/matplotlib-pyplot-tight_layout-in-python/
+        plt.tight_layout()#[10]
         self.canvas.draw()
 
         #Misc Updates, to ensure consistent pacing across all updates
@@ -220,7 +220,7 @@ class Menu(ttk.Frame):
 
         self.after(1000, self.update_graph)
 
-    # https://askubuntu.com/questions/152191/getting-the-name-of-the-process-that-corresponds-to-the-active-window, https://psutil.readthedocs.io/en/latest/, https://github.com/mhammond/pywin32/blob/main/adodbapi/readme.txt
+    #[11], [12], [13]
     def get_active_window_name(self):
         # gets the active window handle
         hwnd = win32gui.GetForegroundWindow()
@@ -233,7 +233,7 @@ class Menu(ttk.Frame):
             # could not even get a process – fallback to window title
             return win32gui.GetWindowText(hwnd) or None
 
-        # try to get the FileDescription of a processhttps://learn.microsoft.com/en-us/windows/win32/menurc/stringfileinfo-block
+        # try to get the FileDescription of a process [14]
         # this gives the most user friendly name for a given process. For example, for microsoft edge, it'll show "Microsoft Edge", while the process name gives "msedge" or "msedge.exe" and the window title includes the name of the active tab
         try:
             # get the list of (lang, codepage) tuples
