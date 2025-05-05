@@ -45,14 +45,15 @@ byeun3@ocdsb.ca
 
 [10] Dev.to, "List of Widgets in Tkinter," Dev.to, 2023. [Online]. Available: https://dev.to/shadowclaw11/list-of-widgets-in-tkinter-5b4n. [Accessed: 27-Febuary-2025].
 
-[11] GeeksforGeeks, "Matplotlib.pyplot.tight_layout() in Python," GeeksforGeeks, 2023. [Online]. Available: https://www.geeksforgeeks.org/matplotlib-pyplot-tight_layout-in-python/. [Accessed: 15-April-2025].
+[11] Stack Overflow, "How do I sort a dictionary by value?," Stack Overflow, 2009. [Online]. Available: https://stackoverflow.com/questions/613183/how-do-i-sort-a-dictionary-by-value. [Accessed: 1-May-2025].
 
-[12] Ask Ubuntu, "Getting the name of the process that corresponds to the active window," Ask Ubuntu, 2012. [Online]. Available: https://askubuntu.com/questions/152191/getting-the-name-of-the-process-that-corresponds-to-the-active-window. [Accessed: 29-January-2025].
+[12] GeeksforGeeks, "Matplotlib.pyplot.tight_layout() in Python," GeeksforGeeks, 2023. [Online]. Available: https://www.geeksforgeeks.org/matplotlib-pyplot-tight_layout-in-python/. [Accessed: 15-April-2025].
 
-[13] psutil, "psutil documentation," psutil, 2023. [Online]. Available: https://psutil.readthedocs.io/en/latest/. [Accessed: 4-Febuary-2025].
+[13] Ask Ubuntu, "Getting the name of the process that corresponds to the active window," Ask Ubuntu, 2012. [Online]. Available: https://askubuntu.com/questions/152191/getting-the-name-of-the-process-that-corresponds-to-the-active-window. [Accessed: 29-January-2025].
 
-[14] GitHub, "pywin32 Documentation," GitHub, 2023. [Online]. Available: https://github.com/mhammond/pywin32/blob/main/adodbapi/readme.txt. [Accessed: 4-Febuary-2025].
+[14] psutil, "psutil documentation," psutil, 2023. [Online]. Available: https://psutil.readthedocs.io/en/latest/. [Accessed: 4-Febuary-2025].
 
-[15] Microsoft, "StringFileInfo Block," Microsoft Docs, 2023. [Online]. Available: https://learn.microsoft.com/en-us/windows/win32/menurc/stringfileinfo-block. [Accessed: 4-Febuary-2025].
+[15] GitHub, "pywin32 Documentation," GitHub, 2023. [Online]. Available: https://github.com/mhammond/pywin32/blob/main/adodbapi/readme.txt. [Accessed: 4-Febuary-2025].
 
-[16] Stack Overflow, "How do I sort a dictionary by value?," Stack Overflow, 2009. [Online]. Available: https://stackoverflow.com/questions/613183/how-do-i-sort-a-dictionary-by-value. [Accessed: 1-May-2025].
+[16] Microsoft, "StringFileInfo Block," Microsoft Docs, 2023. [Online]. Available: https://learn.microsoft.com/en-us/windows/win32/menurc/stringfileinfo-block. [Accessed: 4-Febuary-2025].
+
