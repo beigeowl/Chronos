@@ -127,16 +127,16 @@ class Menu(ttk.Frame):
         self.leftframe.rowconfigure((0,3), weight = 1)
         self.leftframe.columnconfigure(0, weight = 1)
 
-        #Right Frame, set up for further grid placement within the frame, 1 x 5, [9]
+        #Right Frame, set up for further grid placement within the frame, 1 x 5, [8]
         self.rightframe = tk.Frame(self)
         self.rightframe.grid(column = 1, row = 1)
         self.rightframe.rowconfigure((0,4), weight = 1)
         self.rightframe.columnconfigure(0, weight = 1)
 
-        #Title, with assigned attributes [10]
+        #Title, with assigned attributes [8]
         self.title =  ttk.Label(self, text = 'Chronos', font = ("Helvetica", 35, "bold"))
 
-        #Left Frame Widgets,[11]
+        #Left Frame Widgets,[8]
         self.apptime = ttk.Label(self.rightframe, text = "App Time", font = ("Helvetica", 15, "bold"))
         self.totaltime = ttk.Label(self.rightframe, text = "Total Time", font = ("Helvetica", 15, "bold"))
         #Attributes for the list (Treeview) including headings and size, [12]
