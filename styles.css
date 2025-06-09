@@ -1,0 +1,25 @@
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: sans-serif;
+  background: #eaeaea;
+}
+
+body {
+  display: flex;
+  justify-content: center;   /* horizontally center */
+  align-items: center;       /* vertically center */
+}
+
+.sliders-wrapper {
+  display: flex;
+  flex-direction: column;    /* stack vertically */
+  align-items: center;
+  gap: 20px;                 /* spacing between sliders */
+}
+
+.slidecontainer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
